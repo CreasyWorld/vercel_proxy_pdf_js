@@ -3,33 +3,41 @@ export default async function handler(req, res) {
   const fileUrl = req.query.url;
 
   if (!fileUrl) {
-    res.status(400).send("Missing URL");
-    return;
+    return res.status(400).send("Missing URL");
   }
 
   try {
-    // 直接请求 PDF 文件，不跟随 302/301 重定向
+    // 请求 PDF 文件，设置不自动跟随重定向
     const fetchRes = await fetch(fileUrl, {
       method: "GET",
-      redirect: "manual", // 设置不跟随重定向
+      redirect: "manual",  // 不自动跟随重定向
     });
 
-    // 如果响应是 3xx 重定向
+    // 如果是 302 或 其他 3xx 状态码，检查 Location 头，手动重定向
     if (fetchRes.status >= 300 && fetchRes.status < 400) {
-      return res.status(fetchRes.status).send("Redirect detected");
+      const redirectUrl = fetchRes.headers.get('Location');
+      if (redirectUrl) {
+        console.log(`Redirecting to: ${redirectUrl}`);
+        // 如果遇到重定向，直接重定向到新的 URL
+        return res.redirect(redirectUrl);
+      } else {
+        return res.status(fetchRes.status).send("No redirect URL found in Location header");
+      }
     }
 
+    // 如果请求失败
     if (!fetchRes.ok) {
-      return res.status(fetchRes.status).send("Failed to fetch PDF" + fetchRes.status);
+      return res.status(fetchRes.status).send("Failed to fetch PDF");
     }
 
-    // 设置响应头，以 PDF 形式返回数据
+    // 设置响应头，返回 PDF 文件内容
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Access-Control-Allow-Origin", "*"); // 允许跨域访问
+    res.setHeader("Access-Control-Allow-Origin", "*");  // CORS 支持
 
-    // 将 PDF 文件流转发到客户端
+    // 将 PDF 数据流直接返回
     fetchRes.body.pipeTo(res);
   } catch (err) {
+    // 捕获任何错误并返回
     res.status(500).send("Proxy error: " + err.message);
   }
 }
