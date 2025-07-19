@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     }
 
     if (!fetchRes.ok) {
-      return res.status(fetchRes.status).send("Failed to fetch PDF");
+      return res.status(fetchRes.status).send("Failed to fetch PDF" + fetchRes.status);
     }
 
     // 设置响应头，以 PDF 形式返回数据
