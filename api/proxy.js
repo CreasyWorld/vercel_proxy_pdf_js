@@ -8,29 +8,27 @@ export default async function handler(req, res) {
   }
 
   try {
+    // 直接请求 PDF 文件，不跟随 302/301 重定向
     const fetchRes = await fetch(fileUrl, {
       method: "GET",
-      redirect: "follow", // 跟随 302
+      redirect: "manual", // 设置不跟随重定向
     });
 
+    // 如果响应是 3xx 重定向
+    if (fetchRes.status >= 300 && fetchRes.status < 400) {
+      return res.status(fetchRes.status).send("Redirect detected");
+    }
+
     if (!fetchRes.ok) {
-      res.status(fetchRes.status).send("Failed to fetch target PDF");
-      return;
+      return res.status(fetchRes.status).send("Failed to fetch PDF");
     }
 
-    // 设置响应类型为 PDF
+    // 设置响应头，以 PDF 形式返回数据
     res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Access-Control-Allow-Origin", "*"); // 允许跨域访问
 
-    // 添加 CORS 支持
-    res.setHeader("Access-Control-Allow-Origin", "*");
-
-    // 流式转发 PDF 内容
-    const reader = fetchRes.body;
-    if (!reader) {
-      return res.status(500).send("Empty response");
-    }
-
-    reader.pipeTo(res);
+    // 将 PDF 文件流转发到客户端
+    fetchRes.body.pipeTo(res);
   } catch (err) {
     res.status(500).send("Proxy error: " + err.message);
   }
