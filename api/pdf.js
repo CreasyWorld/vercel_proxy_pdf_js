@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 		return res.status(400).send("Missing URL");
 	}
 	
-	const fileUrl = arr[1];
+	let fileUrl = arr[1];
 
 	if (!fileUrl) {
 		return res.status(400).send("Missing URL");
