@@ -24,10 +24,16 @@ export default async function handler(req, res) {
       throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
     }
 
-    const pdfBuffer = await response.buffer();
+    // 使用 arrayBuffer() 获取文件的二进制数据
+    const arrayBuffer = await response.arrayBuffer();
+
+    // 将 ArrayBuffer 转为 Buffer，并返回文件
+    const buffer = Buffer.from(arrayBuffer);
+
+    // 设置响应头，返回 PDF 文件
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="downloaded.pdf"');
-    res.status(200).send(pdfBuffer);
+    res.status(200).send(buffer);  // 返回 PDF 文件内容
 
   } catch (error) {
     console.error('Error fetching PDF:', error);
