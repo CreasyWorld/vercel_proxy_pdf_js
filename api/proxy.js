@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
     // 如果请求失败
     if (!fetchRes.ok) {
-      return res.status(fetchRes.status).send("Failed to fetch PDF");
+      return res.status(fetchRes.status).send("Failed to fetch PDF" + fetchRes.status);
     }
 
     // 设置响应头，返回 PDF 文件内容
