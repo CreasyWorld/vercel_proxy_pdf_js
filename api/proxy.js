@@ -8,11 +8,18 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(fileUrl);
-    const pdfBuffer = await response.buffer();
-    res.setHeader('Content-Type', 'application/pdf');
-    res.send(pdfBuffer);
+    if(response.buffer) {
+		
+		const pdfBuffer = await response.buffer();
+		res.setHeader('Content-Type', 'application/pdf');
+		res.send(pdfBuffer);
+	} else {
+		res.status(400).json({ error: 'error: ', ...response });
+	}
+	
+	
   } catch (error) {
-	  console.log(error)
-    res.status(400).json({ error: 'PDF fetch failed' });
+		console.log(error)
+		res.status(400).json({ error: 'PDF fetch failed' });
   }
 }
