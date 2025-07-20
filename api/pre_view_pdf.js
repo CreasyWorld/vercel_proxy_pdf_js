@@ -38,6 +38,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching PDF:', error);
-    res.status(400).json({ error: 'Failed to proxy PDF', details: error.message });
+    res.status(400).json({ error: 'Failed to proxy PDF' + req.url, details: error.message });
   }
 }
