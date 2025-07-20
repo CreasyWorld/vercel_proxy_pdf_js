@@ -12,6 +12,7 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/pdf');
     res.send(pdfBuffer);
   } catch (error) {
+	  console.log(error)
     res.status(400).json({ error: 'PDF fetch failed' });
   }
 }
