@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 		});
 
 		if (!response.ok) {
-		  return res.status(400).send("获取pdf错误: " + response.status);
+		  return res.status(400).send("获取pdf错误: " + response.status + " url: " + fileUrl);
 		}
 		
 		if (response.status === 302) {
