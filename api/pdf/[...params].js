@@ -1,7 +1,7 @@
 // /api/proxy.js
 export default async function handler(req, res) {
 	
-	const arr = req.url.split("/api/pdf?url=");
+	const arr = req.url.split("/api/pdf/");
 	
 	if(arr.length < 1) {
 		return res.status(400).send("Missing URL");
