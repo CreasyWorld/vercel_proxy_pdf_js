@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(atob(fileUrl), {
+    const response = await fetch(decodeURIComponent(atob(fileUrl)), {
       method: 'GET',
       headers: {
         'User-Agent': 'Mozilla/5.0',
