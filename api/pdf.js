@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 		return res.status(400).send("Missing URL");
 	}
 
-	
+	fileUrl = decodeURIComponent(fileUrl);
 
 	try {
 		const response = await fetch(fileUrl, {
