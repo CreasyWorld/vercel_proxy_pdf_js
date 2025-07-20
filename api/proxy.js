@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 		res.setHeader('Content-Type', 'application/pdf');
 		res.send(pdfBuffer);
 	} else {
-		res.status(400).json({ error: 'error: ', ...response });
+		res.status(400).json({ error: 'error: ' + response.status });
 	}
 	
 	
