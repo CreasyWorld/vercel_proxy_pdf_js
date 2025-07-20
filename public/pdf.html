@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PDF.js Viewer (CORS Safe)</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="pdf-canvas"></canvas>
+
+  <!-- 引入 PDF.js 库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.js"></script>
+  <script type="module">
+	import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.2.67/build/pdf.mjs";
+    // 设置 worker 路径（必须设置）
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js";
+
+    // 获取 URL 参数中的 file 参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const pdfUrl = urlParams.get("file");
+
+    if (!pdfUrl) {
+      document.body.innerHTML = "<p style='text-align:center;margin-top:20px;'>请在 URL 中指定 PDF 文件：?file=https://example.com/xxx.pdf</p>";
+    } else {
+      // 跨域加载 PDF：fetch → blob → object URL
+      fetch("https://vercel-proxy-pdf-js.vercel.app/api/proxy?url=" + encodeURIComponent(pdfUrl))
+        .then(response => {
+          if (!response.ok) {
+		  console.log(response.location);
+            throw new Error("Network error loading PDF");
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          const blobUrl = URL.createObjectURL(blob);
+          return pdfjsLib.getDocument(blobUrl).promise;
+        })
+        .then(pdf => {
+          console.log("PDF loaded, total pages:", pdf.numPages);
+          return pdf.getPage(1).then(page => {
+            const scale = 1.5;
+            const viewport = page.getViewport({ scale });
+            const canvas = document.getElementById("pdf-canvas");
+            const context = canvas.getContext("2d");
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+              canvasContext: context,
+              viewport: viewport
+            };
+            return page.render(renderContext).promise;
+          });
+        })
+        .then(() => {
+          console.log("PDF Page rendered successfully");
+        })
+        .catch(error => {
+          document.body.innerHTML = `<p style='color:red;text-align:center;'>加载 PDF 出错：${error.message}</p>`;
+          console.error("PDF.js error:", error);
+        });
+    }
+  </script>
+</body>
+</html>
