@@ -4,6 +4,10 @@
     {
       "source": "/api/pdf/(.*)",
       "destination": "/api/pdf"
+    },
+	{
+      "source": "/api/download/(.*)",
+      "destination": "/api/download"
     }
   ]
 }
