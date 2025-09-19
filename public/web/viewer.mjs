@@ -16271,7 +16271,8 @@ initCom(PDFViewerApplication);
     const file = evt.fileInput.files[0];
     this.open({
       url: URL.createObjectURL(file),
-      originalUrl: encodeURIComponent(file.name)
+      originalUrl: encodeURIComponent(file.name),
+      rangeChunkSize: 64 * 1024 * 1024
     });
   };
   var onOpenFile = function (evt) {

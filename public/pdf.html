@@ -16,6 +16,7 @@
   </style>
 </head>
 <body>
+
   <canvas id="pdf-canvas"></canvas>
 
   <!-- 引入 PDF.js 库 -->
@@ -33,42 +34,66 @@
       document.body.innerHTML = "<p style='text-align:center;margin-top:20px;'>请在 URL 中指定 PDF 文件：?file=https://example.com/xxx.pdf</p>";
     } else {
       // 跨域加载 PDF：fetch → blob → object URL
-      fetch("https://vercel-proxy-pdf-js.vercel.app/api/proxy?url=" + encodeURIComponent(pdfUrl))
-        .then(response => {
-          if (!response.ok) {
-		  console.log(response.location);
-            throw new Error("Network error loading PDF");
-          }
-          return response.blob();
-        })
-        .then(blob => {
-          const blobUrl = URL.createObjectURL(blob);
-          return pdfjsLib.getDocument(blobUrl).promise;
-        })
-        .then(pdf => {
-          console.log("PDF loaded, total pages:", pdf.numPages);
-          return pdf.getPage(1).then(page => {
-            const scale = 1.5;
-            const viewport = page.getViewport({ scale });
-            const canvas = document.getElementById("pdf-canvas");
-            const context = canvas.getContext("2d");
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+      // fetch("https://vercel-proxy-pdf-js.vercel.app/api/proxy?url=" + encodeURIComponent(pdfUrl))
+      //   .then(response => {
+      //     if (!response.ok) {
+		//   console.log(response.location);
+      //       throw new Error("Network error loading PDF");
+      //     }
+      //     return response.blob();
+      //   })
+      //   .then(blob => {
+      //     const blobUrl = URL.createObjectURL(blob);
+      //     return pdfjsLib.getDocument(blobUrl).promise;
+      //   })
+      //   .then(pdf => {
+      //     console.log("PDF loaded, total pages:", pdf.numPages);
+      //     return pdf.getPage(1).then(page => {
+      //       const scale = 1.5;
+      //       const viewport = page.getViewport({ scale });
+      //       const canvas = document.getElementById("pdf-canvas");
+      //       const context = canvas.getContext("2d");
+      //       canvas.height = viewport.height;
+      //       canvas.width = viewport.width;
+      //
+      //       const renderContext = {
+      //         canvasContext: context,
+      //         viewport: viewport
+      //       };
+      //       return page.render(renderContext).promise;
+      //     });
+      //   })
+      //   .then(() => {
+      //     console.log("PDF Page rendered successfully");
+      //   })
+      //   .catch(error => {
+      //     document.body.innerHTML = `<p style='color:red;text-align:center;'>加载 PDF 出错：${error.message}</p>`;
+      //     console.error("PDF.js error:", error);
+      //   });
 
-            const renderContext = {
-              canvasContext: context,
-              viewport: viewport
-            };
-            return page.render(renderContext).promise;
-          });
-        })
-        .then(() => {
-          console.log("PDF Page rendered successfully");
-        })
-        .catch(error => {
-          document.body.innerHTML = `<p style='color:red;text-align:center;'>加载 PDF 出错：${error.message}</p>`;
-          console.error("PDF.js error:", error);
-        });
+      const loadingTask = pdfjsLib.getDocument({
+        url: "https://vercel-proxy-pdf-js.vercel.app/api/proxy?url=" + encodeURIComponent(pdfUrl),      // 你的 PDF URL
+        rangeChunkSize: 64 * 1024 * 1024          // 每次请求64KB，可调整
+      });
+
+      loadingTask.promise.then(async (pdf) => {
+        console.log(`PDF loaded, total pages: ${pdf.numPages}`);
+
+        // 逐页加载渲染
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+
+          const viewport = page.getViewport({ scale: 1.5 });
+          const canvas = document.createElement("canvas");
+          document.body.appendChild(canvas);
+          const context = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          await page.render({ canvasContext: context, viewport }).promise;
+          console.log(`Page ${pageNum} rendered`);
+        }
+      });
     }
   </script>
 </body>
