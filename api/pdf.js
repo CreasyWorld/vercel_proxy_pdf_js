@@ -66,7 +66,6 @@ export default async function handler(req, res) {
 					return ;
 				}
 			}
-
 			// 设置状态码和关键头
 			res.status(remoteRes.statusCode);
 			Object.keys(remoteRes.headers).forEach((key) => {
