@@ -15461,6 +15461,7 @@ const PDFViewerApplication = {
       this.setTitleUsingUrl(args.originalUrl || args.url, args.url);
     }
     const apiParams = AppOptions.getAll(OptionKind.API);
+    console.log("123", apiParams, args);
     const loadingTask = getDocument({
       ...apiParams,
       ...args
