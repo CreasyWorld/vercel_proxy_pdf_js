@@ -33,7 +33,11 @@ export default async function handler(req, res) {
 					}
 
 					https.get(location, {headers}, (remoteRes_1) => {
-						console.log(remoteRes_1.statusCode);
+						// 设置状态码和关键头
+						res.status(remoteRes_1.statusCode);
+						Object.keys(remoteRes_1.headers).forEach((key) => {
+							res.setHeader(key, remoteRes_1.headers[key]);
+						});
 						remoteRes_1
 							.on("error", (err) => {
 								console.error("Remote fetch error:", err);
@@ -45,6 +49,11 @@ export default async function handler(req, res) {
 				}
 			}
 
+			// 设置状态码和关键头
+			res.status(remoteRes.statusCode);
+			Object.keys(remoteRes.headers).forEach((key) => {
+				res.setHeader(key, remoteRes.headers[key]);
+			});
 			remoteRes
 				.on("error", (err) => {
 					console.error("Remote fetch error:", err);
