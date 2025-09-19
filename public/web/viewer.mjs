@@ -15261,6 +15261,7 @@ const PDFViewerApplication = {
       appConfig.findBar?.toggleButton?.classList.add("hidden");
     }
     if (file) {
+      console.log("打开文件，jjjjj", file);
       this.open({
         url: file
       });
@@ -16269,7 +16270,7 @@ initCom(PDFViewerApplication);
       return;
     }
     const file = evt.fileInput.files[0];
-    console.log("测试ggggggggggggggggggggggggggg");
+
     this.open({
       url: URL.createObjectURL(file),
       originalUrl: encodeURIComponent(file.name),
