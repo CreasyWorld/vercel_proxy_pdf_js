@@ -15263,7 +15263,8 @@ const PDFViewerApplication = {
     if (file) {
       console.log("打开文件，jjjjj", file);
       this.open({
-        url: file
+        url: file,
+        rangeChunkSize: 64 * 1024 * 1024
       });
     } else {
       this._hideViewBookmark();
@@ -16274,7 +16275,7 @@ initCom(PDFViewerApplication);
     this.open({
       url: URL.createObjectURL(file),
       originalUrl: encodeURIComponent(file.name),
-      // rangeChunkSize: 64 * 1024 * 1024
+      rangeChunkSize: 64 * 1024 * 1024
     });
   };
   var onOpenFile = function (evt) {
