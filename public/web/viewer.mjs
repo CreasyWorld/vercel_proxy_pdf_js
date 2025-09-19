@@ -15261,10 +15261,8 @@ const PDFViewerApplication = {
       appConfig.findBar?.toggleButton?.classList.add("hidden");
     }
     if (file) {
-      console.log("打开文件，jjjjj", file);
       this.open({
-        url: file,
-        rangeChunkSize: 64 * 1024 * 1024
+        url: file
       });
     } else {
       this._hideViewBookmark();
@@ -15461,10 +15459,11 @@ const PDFViewerApplication = {
       this.setTitleUsingUrl(args.originalUrl || args.url, args.url);
     }
     const apiParams = AppOptions.getAll(OptionKind.API);
-    console.log("123", apiParams, args);
+
     const loadingTask = getDocument({
       ...apiParams,
-      ...args
+      ...args,
+      rangeChunkSize: 16 * 1024 * 1024
     });
     this.pdfLoadingTask = loadingTask;
     loadingTask.onPassword = (updateCallback, reason) => {
@@ -16275,8 +16274,7 @@ initCom(PDFViewerApplication);
 
     this.open({
       url: URL.createObjectURL(file),
-      originalUrl: encodeURIComponent(file.name),
-      rangeChunkSize: 64 * 1024 * 1024
+      originalUrl: encodeURIComponent(file.name)
     });
   };
   var onOpenFile = function (evt) {

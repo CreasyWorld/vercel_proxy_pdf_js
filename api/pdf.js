@@ -35,8 +35,26 @@ export default async function handler(req, res) {
 					https.get(location, {headers}, (remoteRes_1) => {
 						// 设置状态码和关键头
 						res.status(remoteRes_1.statusCode);
-						Object.keys(remoteRes_1.headers).forEach((key) => {
-							res.setHeader(key, remoteRes_1.headers[key]);
+						Object.keys(remoteRes_1.headers).forEach((value, key) => {
+							if (!["transfer-encoding", "content-encoding", "content-length"].includes(key.toLowerCase())) {
+
+								if(key.toLowerCase() === "content-disposition") {
+									if (value) {
+										// 解析文件名
+										const match = value.match(/filename="?(.+?)"?$/i);
+										if (match) {
+											const rawFileName = match[1];
+											// 对文件名做 encodeURIComponent 编码，符合 RFC 5987
+											const encodedFileName = encodeURIComponent(rawFileName);
+											res.setHeader('content-disposition', `attachment; filename*=UTF-8''${encodedFileName}`);
+										}
+									}
+								} else {
+
+									res.setHeader(key, remoteRes_1.headers[key]);
+								}
+							}
+
 						});
 						remoteRes_1
 							.on("error", (err) => {
@@ -51,8 +69,26 @@ export default async function handler(req, res) {
 
 			// 设置状态码和关键头
 			res.status(remoteRes.statusCode);
-			Object.keys(remoteRes.headers).forEach((key) => {
-				res.setHeader(key, remoteRes.headers[key]);
+			Object.keys(remoteRes.headers).forEach((value, key) => {
+				if (!["transfer-encoding", "content-encoding", "content-length"].includes(key.toLowerCase())) {
+
+					if(key.toLowerCase() === "content-disposition") {
+						if (value) {
+							// 解析文件名
+							const match = value.match(/filename="?(.+?)"?$/i);
+							if (match) {
+								const rawFileName = match[1];
+								// 对文件名做 encodeURIComponent 编码，符合 RFC 5987
+								const encodedFileName = encodeURIComponent(rawFileName);
+								res.setHeader('content-disposition', `attachment; filename*=UTF-8''${encodedFileName}`);
+							}
+						}
+					} else {
+
+						res.setHeader(key, remoteRes_1.headers[key]);
+					}
+				}
+
 			});
 			remoteRes
 				.on("error", (err) => {
