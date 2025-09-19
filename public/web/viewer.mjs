@@ -16269,10 +16269,11 @@ initCom(PDFViewerApplication);
       return;
     }
     const file = evt.fileInput.files[0];
+    console.log("测试ggggggggggggggggggggggggggg");
     this.open({
       url: URL.createObjectURL(file),
       originalUrl: encodeURIComponent(file.name),
-      rangeChunkSize: 64 * 1024 * 1024
+      // rangeChunkSize: 64 * 1024 * 1024
     });
   };
   var onOpenFile = function (evt) {
