@@ -35,13 +35,13 @@ export default async function handler(req, res) {
 					https.get(location, {headers}, (remoteRes_1) => {
 						// 设置状态码和关键头
 						res.status(remoteRes_1.statusCode);
-						Object.keys(remoteRes_1.headers).forEach((value, key) => {
+						Object.keys(remoteRes_1.headers).forEach((key) => {
 							if (!["transfer-encoding", "content-encoding", "content-length"].includes(key.toLowerCase())) {
 
 								if(key.toLowerCase() === "content-disposition") {
-									if (value) {
+									if (remoteRes_1.headers[key]) {
 										// 解析文件名
-										const match = value.match(/filename="?(.+?)"?$/i);
+										const match = remoteRes_1.headers[key].match(/filename="?(.+?)"?$/i);
 										if (match) {
 											const rawFileName = match[1];
 											// 对文件名做 encodeURIComponent 编码，符合 RFC 5987
@@ -69,13 +69,13 @@ export default async function handler(req, res) {
 
 			// 设置状态码和关键头
 			res.status(remoteRes.statusCode);
-			Object.keys(remoteRes.headers).forEach((value, key) => {
+			Object.keys(remoteRes.headers).forEach((key) => {
 				if (!["transfer-encoding", "content-encoding", "content-length"].includes(key.toLowerCase())) {
 
 					if(key.toLowerCase() === "content-disposition") {
-						if (value) {
+						if (remoteRes.headers[key]) {
 							// 解析文件名
-							const match = value.match(/filename="?(.+?)"?$/i);
+							const match = remoteRes.headers[key].match(/filename="?(.+?)"?$/i);
 							if (match) {
 								const rawFileName = match[1];
 								// 对文件名做 encodeURIComponent 编码，符合 RFC 5987
