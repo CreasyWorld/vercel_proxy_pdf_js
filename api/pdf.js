@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 	if (!fileUrl) {
 		return res.status(400).send("Missing URL");
 	}
-	let range = req.headers["Range"] || req.headers["range"];
+	const range = req.headers["Range"] || req.headers["range"];
 	console.log(range);
 	fileUrl = decodeURIComponent(fileUrl);
 	console.log(fileUrl);
@@ -27,12 +27,13 @@ export default async function handler(req, res) {
 
 				if (location) {
 
-					if(!range) {
-						range = "bytes=0-65535";
+					let headers = {};
+					if(range) {
+						headers.Range = range;
 					}
-					let headers = {Range: range};
 
 					https.get(location, {headers}, (remoteRes_1) => {
+						console.log(remoteRes_1.statusCode);
 						remoteRes_1
 							.on("error", (err) => {
 								console.error("Remote fetch error:", err);
